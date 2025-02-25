@@ -178,11 +178,11 @@
             }
             
             document.getElementById("outputText").value = removeDuplicateWords(text);
-            
             let charCount = text.length;
             let wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
             document.getElementById("statsOutput").innerText = `Số ký tự: ${charCount} | Số chữ: ${wordCount}`;
             checkText()
+            console.log(text.split(" "))
         }
 
         function updateStats() {
@@ -193,17 +193,24 @@
         }
         function removeDuplicateWords(text) {
             let words = text.split(/\s+/);
-            let seen = new Set();
             let result = [];
 
-            for (let word of words) {
-                if (!seen.has(word)) {
-                    seen.add(word);
+            for (let i = 0; i < words.length; i++) {
+                let word = words[i];
+                let nextWord = words[i + 1] || "";
+
+                // Giữ lại từ nếu nó không lặp, hoặc nếu là danh từ riêng lặp (chữ cái đầu viết hoa)
+                if (word !== nextWord || isCapitalized(word)) {
                     result.push(word);
                 }
             }
 
             return result.join(" ");
+        }
+
+        // Kiểm tra xem từ có chữ cái đầu viết hoa không (danh từ riêng)
+        function isCapitalized(word) {
+            return /^[A-ZÀ-Ỹ]/.test(word);
         }
 
         function copyToClipboard() {
