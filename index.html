@@ -179,10 +179,9 @@
             
             document.getElementById("outputText").value = removeDuplicateWords(text);
             let charCount = text.length;
-            let wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            let wordCount = text.trim() ? removeDuplicateWords(text).trim().split(/\s+/).length : 0;
             document.getElementById("statsOutput").innerText = `Số ký tự: ${charCount} | Số chữ: ${wordCount}`;
             checkText()
-            console.log(text.split(" "))
         }
 
         function updateStats() {
