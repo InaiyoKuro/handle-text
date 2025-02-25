@@ -202,17 +202,18 @@
 
         function findDuplicateWords(text) {
             let replaceDict = {
-                "[": "",
-                "]": "",
-                "“": "",
-                "”": "",
-                ".": "",
-                ",": "",
+                "[": " ",
+                "]": " ",
+                "“": " ",
+                "”": " ",
+                ".": " ",
+                ",": " ",
             };            
             
             for (let key in replaceDict) {
                 text = text.split(key).join(replaceDict[key]);
             }
+            console.log(text)
 
             let words = text.split(/\s+/); // Tách từ theo khoảng trắng
 
@@ -255,7 +256,7 @@
             let myDiv = document.getElementById("myDiv");
             let duplicateWarning = document.getElementById("duplicateWarning");
 
-            let pattern = /aw|aa|ee|oo|ow|uw|dd|as|af|ax|ar|aj|es|ef|ex|er|ej|is|if|ix|ir|ij|os|of|ox|or|oj|us|uf|ux|ur|uj|ys|yf|yx|yr|yj/g;
+            let pattern = /aw|aa|ee|oo|ow|uw|dd|as|af|ax|ar|aj|es|ef|ex|er|ej|is|if|ix|ir|ij|os|of|ox|or|oj|us|uf|ux|ur|uj|ys|yf|yx|yr|yj|uw|ưf|ưs|ưj|ưx|ưr/g;
             const regex = /\b(\w+)\b(?=.*\b\1\b)/gi;
 
             let matches = text.match(pattern);       
