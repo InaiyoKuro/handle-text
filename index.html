@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Đơn Giản</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        h1 {
+            color: #ffffff;
+        }
+        textarea {
+            padding: 15px;
+            width: 90%;
+            height: 200px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 16px;
+            background-color: #333;
+            color: #ffffff;
+            resize: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #output {
+            margin: 20px auto;
+        }
+        #stats {
+            margin-top: 10px;
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        #toast {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            padding: 10px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        div.button{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #myDiv {
+            display: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: red;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin: 20px;
+            }
+            textarea {
+                width: 90%;
+            }
+            #output {
+                width: 90%;
+            }
+            button {
+                width: 90%;
+                margin: 10px;
+                display: block;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Xử Lý Văn Bản</h1>
+    <textarea id="userInput" placeholder="Nhập văn bản của bạn" oninput="updateStats()"></textarea>
+    <div id="stats">Số ký tự: 0 | Số chữ: 0</div>
+    <div id="myDiv">Chuỗi có chứa "oo"!</div>
+
+    <div class="button">
+        <button onclick="processText()">Xử lý văn bản</button>
+    </div>
+    <div id="output">
+        <textarea id="outputText" readonly></textarea>
+    </div>
+    <div id="statsOutput" style="margin-bottom: 20px; font-size: 20px;">Số ký tự: 0 | Số chữ: 0</div>
+    <div class="button">
+        <button onclick="copyToClipboard()">Copy</button>
+        <button onclick="saveFile()">Lưu file</button>
+    </div>
+    <div id="toast">✅ Đã copy!</div>
+    <script>
+        function processText() {
+            let text = document.getElementById("userInput").value;
+
+            const specialChars = {
+                "A": "A", "a": "a", "ɑ": "a", "α": "a", "ά": "a", "ą": "a", "ʌ": "a", "ค": "a", "Λ": "A", "ᐰ": "A", "Δ": "A", "λ": "A", "ﾑ": "A", "ⓐ": "a", "Ⓐ": "A",
+                "B": "B", "b": "b", "ъ": "b", "ь": "b", "ɓ": "b", "в": "b", "ƅ": "b", "๒": "b", "ҍ": "b", "ɮ": "b", "฿": "B", "ᗽ": "B", "β": "B", "ß": "B", "Ɓ": "B", "乃": "B", "ⓑ": "b", "Ⓑ": "B",
+                "C": "C", "c": "c", "ċ": "c", "ĉ": "c", "ƈ": "c", "ç": "c", "©": "c", "¢": "c", "ς": "c", "Ć": "C", "Ĉ": "C", "Č": "C", "Ƈ": "C", "ᑖ": "C", "ⓒ": "c", "Ⓒ": "C",
+                "D": "D", "d": "d", "ɗ": "d", "∂": "d", "ժ": "d", "ძ": "d", "ƌ": "d", "ɖ": "d", "₫": "d", "δ": "d", "ᶑ": "d", "ð": "d", "ď": "d", "Ð": "D", "Ď": "D", "Ɗ": "D", "ⓓ": "d", "Ⓓ": "D",
+                "E": "E", "e": "e", "ҽ": "e", "ℯ": "e", "ɛ": "e", "ε": "e", "є": "e", "ĕ": "e", "ɘ": "e", "Σ": "E", "Ǝ": "E", "Ɛ": "E", "ℰ": "E", "ᙓ": "E", "Є": "E", "ع": "E", "ⓔ": "e", "Ⓔ": "E",
+                "F": "F", "f": "f", "ғ": "f", "ʄ": "f", "բ": "f", "⨎": "F", "ƒ": "f", "∱": "F", "Ғ": "F", "℉": "F", "ℱ": "F", "ⓕ": "f", "Ⓕ": "F",
+                "G": "G", "g": "g", "ɠ": "g", "ĝ": "g", "ɢ": "G", "ʛ": "G", "ց": "g", "ʚ": "g", "ğ": "g", "ġ": "g", "ģ": "g", "₲": "G", "Ĝ": "G", "Ɠ": "G", "Ģ": "G", "Ǥ": "G", "ⓖ": "g", "Ⓖ": "G",
+                "H": "H", "h": "h", "ĥ": "h", "ħ": "h", "н": "h", "ɦ": "h", "ԋ": "h", "հ": "h", "ɧ": "h", "ɥ": "h", "ん": "h", "ⴙ": "H", "ђ": "h", "Ћ": "H", "ⴼ": "H", "Ĥ": "H", "Ħ": "H", "Ή": "H", "ⓗ": "h", "Ⓗ": "H",
+                "I": "I", "i": "i", "ﻨ": "i", "ι": "i", "เ": "i", "ĭ": "i", "ï": "i", "¡": "i", "ϊ": "i", "ἶ": "i", "ɨ": "i", "ɪ": "I", "|": "I", "!": "i", "Ⴠ": "I", "İ": "I", "Ϊ": "I", "أ": "I", "ﾉ": "I", "ⓘ": "i", "Ⓘ": "I",
+                "J": "J", "j": "j", "ʝ": "j", "ʲ": "j", "ڑ": "j", "ژ": "j", "נ": "j", "ƾ": "j", "ⴋ": "J", "į": "j", "ĵ": "j", "Ĵ": "J", "ſ": "j", "¿": "j", "ᒛ": "J", "ﾌ": "J", "ⓙ": "j", "Ⓙ": "J",
+                "K": "K", "k": "k", "ƙ": "k", "к": "k", "қ": "k", "ќ": "k", "ĸ": "k", "ҡ": "k", "ҟ": "k", "Ќ": "K", "Ҡ": "K", "₭": "K", "Ҟ": "K", "Қ": "K", "Ҝ": "K", "ⓚ": "k", "Ⓚ": "K",
+                "L": "L", "l": "l", "ĺ": "l", "ľ": "l", "ŀ": "l", "1": "l", "ł": "l", "ℓ": "l", "ʅ": "l", "ɭ": "l", "ʟ": "l", "Ł": "L", "⎳": "L", "Ŀ": "L", "Ĺ": "L", "Ļ": "L", "し": "L", "ⓛ": "l", "Ⓛ": "L",
+                "M": "M", "m": "m", "ო": "m", "რ": "m", "м": "m", "ɱ": "m", "₥": "m", "ʍ": "m", "๓": "m", "♏": "M", "ᗰ": "M", "ﾶ": "M", "ⓜ": "m", "Ⓜ": "M",
+                "N": "N", "n": "n", "ñ": "n", "ŋ": "n", "ղ": "n", "ռ": "n", "ɲ": "n", "ή": "n", "ภ": "n", "ɴ": "N", "и": "N", "й": "N", "ה": "N", "И": "N", "Й": "N", "₦": "N", "Ɲ": "N", "ⓝ": "n", "Ⓝ": "N",
+                "O": "O", "ō": "o", "ø": "o", "ǿ": "o", "σ": "o", "օ": "o", "๏": "o", "๑": "o", "ő": "o", "ღ": "o", "¤": "o", "♡": "o", "Ø": "O", "Ŏ": "O", "℺": "O", "Ѻ": "O", "ⓞ": "o", "Ⓞ": "O",
+                "P": "P", "p": "p", "ρ": "p", "ῥ": "p", "þ": "p", "Ƥ": "P", "ƥ": "p", "թ": "p", "ք": "p", "ր": "p", "Չ": "P", "Þ": "P", "ᚹ": "P", "ṗ": "p", "Ṗ": "P", "ƿ": "p", "Ƿ": "P", "ㄕ": "P", "ⓟ": "p", "Ⓟ": "P",
+                "Q": "Q", "q": "q", "ҩ": "q", "Գ": "Q", "ƍ": "q", "φ": "q", "ʠ": "q", "ϙ": "q", "ǫ": "q", "ǭ": "q", "զ": "q", "գ": "q", "Զ": "Q", "٩": "q", "Ω": "Q", "Ǫ": "Q", "ⵕ": "Q", "Ⱒ": "Q", "Ǭ": "Q", "Ҩ": "Q", "ⓠ": "q", "Ⓠ": "Q",
+                "R": "R", "r": "r", "ŗ": "r", "ѓ": "r", "ŕ": "r", "ř": "r", "ṝ": "r", "ʀ": "r", "я": "r", "ɾ": "r", "г": "r", "Ґ": "R", "ℜ": "R", "ℝ": "R", "℞": "R", "Ŕ": "R", "Ȓ": "R", "Ŗ": "R", "Ʀ": "R", "Ր": "R", "Я": "R", "Г": "R", "尺": "R", "☈": "R", "ⓡ": "r", "Ⓡ": "R",
+                "S": "S", "s": "s", "ś": "s", "š": "s", "ṩ": "s", "§": "s", "$": "s", "ŝ": "s", "ş": "s", "ѕ": "s", "ֆ": "s", "ʂ": "s", "ร": "s", "ƨ": "s", "Ƨ": "S", "Ś": "S", "Ṩ": "S", "Ş": "S", "ٸ": "S", "ら": "S", "ⓢ": "s", "Ⓢ": "S",
+                "T": "T", "t": "t", "ţ": "t", "τ": "t", "ƭ": "t", "ť": "t", "ŧ": "t", "т": "t", "ʈ": "t", "ե": "t", "ȶ": "t", "ƚ": "t", "Ţ": "T", "Ƭ": "T", "Ť": "T", "Ŧ": "T", "†": "T", "ｲ": "T", "ⓣ": "t", "Ⓣ": "T",
+                "U": "U", "u": "u", "ü": "u", "υ": "u", "ʉ": "u", "ข": "u", "น": "u", "µ": "u", "ย": "u", "ʊ": "u", "ų": "u", "ϋ": "u", "մ": "u", "Ʊ": "U", "Ũ": "U", "ᱢ": "U", "ป": "U", "Ц": "U", "Ų": "U", "ⓤ": "u", "Ⓤ": "U",
+                "V": "V", "v": "v", "ν": "v", "ѵ": "v", "ʋ": "v", "౮": "v", "ΰ": "v", "ύ": "v", "ย": "v", "Ʋ": "V", "Ѵ": "V", "Ɣ": "V", "ɣ": "V", "ɤ": "V", "۷": "V", "⋎": "V", "√": "V", "∀": "V", "ⓥ": "v", "Ⓥ": "V",
+                "W": "W", "w": "w", "ŵ": "w", "ш": "w", "щ": "w", "ฬ": "w", "￦": "W", "ẘ": "W", "ὼ": "W", "ω": "W", "ᗯ": "W", "Ш": "W", "Щ": "W", "Ŵ": "W", "ⓦ": "w", "Ⓦ": "W",
+                "X": "X", "x": "x", "х": "x", "×": "x", "ҳ": "x", "ჯ": "x", "૪": "x", "χ": "x", "Ӿ": "X", "Ж": "X", "Ӽ": "X", "〤": "X", "ﾒ": "X", "ⓧ": "x", "Ⓧ": "X",
+                "Y": "Y", "y": "y", "ŷ": "y", "ʏ": "y", "ყ": "y", "ɥ": "y", "ÿ": "y", "Ƴ": "Y", "¥": "Y", "ɣ": "Y", "ၦ": "Y", "ⴁ": "Y", "ⴣ": "Y", "ⴤ": "Y", "у": "y", "Ⴤ": "y", "ץ": "Y", "γ": "Y", "ψ": "Y", "￥": "Y", "ㄚ": "Y", "ⓨ": "y", "Ⓨ": "Y",
+                "Z": "Z", "z": "z", "ẓ": "z", "ƶ": "z", "ȥ": "z", "ʐ": "z", "ʑ": "z", "ʒ": "z", "ʓ": "z", "ẕ": "z", "ž": "z", "Ƶ": "Z", "Ẑ": "Z", "Ẕ": "Z", "Ź": "Z", "乙": "Z", "ⓩ": "z", "Ⓩ": "Z"
+            };
+
+
+            let replaceDict = {
+                "cameras": "camera",
+                "ta cắn cp": "ta đẩy thuyền cặp này",
+                "[": "",
+                "“": "",
+                "”": "",
+                "]": ".",
+                "?": ".",
+                "….": ".",
+                "...": ".",
+                "..": ".",
+                ", ": ",",
+                ". ": ".",
+                "lỗi lỗitooi": "lỗi tôi",
+                "trên trênmajng": "trên mạng",
+                "với vớitooi": "với tôi",
+                "ty tyquarn": "ty quản"
+            };
+            text = text.replace(/\n/g, " ").replace(/  /g, " ").replace(/ \./g, ".").replace(/"/g, "");
+
+            for (let key in replaceDict) {
+                text = text.split(key).join(replaceDict[key]);
+            }
+            for (let key in specialChars) {
+                text = text.split(key).join(specialChars[key]);
+            }
+            
+            document.getElementById("outputText").value = text;
+            
+            let charCount = text.length;
+            let wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById("statsOutput").innerText = `Số ký tự: ${charCount} | Số chữ: ${wordCount}`;
+            checkText()
+        }
+
+        function updateStats() {
+            let text = document.getElementById("userInput").value;
+            let charCount = text.length;
+            let wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById("stats").innerText = `Số ký tự: ${charCount} | Số chữ: ${wordCount}`;
+        }
+
+        function copyToClipboard() {
+            let outputText = document.getElementById("outputText").value;
+            navigator.clipboard.writeText(outputText).then(() => {
+                let toast = document.getElementById("toast");
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 2000);
+            });
+        }
+        function saveFile() {
+            let content = document.getElementById("outputText").value;  // Lấy nội dung từ textarea
+            let blob = new Blob([content], { type: "text/plain" });   // Tạo file dạng text
+            let link = document.createElement("a");  // Tạo thẻ <a> ẩn
+            link.href = URL.createObjectURL(blob);
+            link.download = "output.txt";  // Đặt tên file khi tải xuống
+            link.click();  // Tự động bấm vào thẻ <a>
+        }
+        function checkText() {
+            let text = document.getElementById("outputText").value;
+            let myDiv = document.getElementById("myDiv");
+
+            let pattern = /aw|aa|ee|oo|ow|uw|dd|as|af|ax|ar|aj|es|ef|ex|er|ej|is|if|ix|ir|ij|os|of|ox|or|oj|us|uf|ux|ur|uj|ys|yf|yx|yr|yj/g;
+            let matches = text.match(pattern);             
+            console.log(matches)
+
+            if (matches) {
+                myDiv.innerHTML = matches.join(" và ");
+                myDiv.style.display = "block"
+
+            } else {
+                myDiv.innerHTML = `Không có "oo" hoặc "j"`;
+                myDiv.style.display = "none"
+            }
+
+        }
+
+    </script>
+</body>
+</html>
