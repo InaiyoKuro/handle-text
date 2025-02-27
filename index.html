@@ -165,12 +165,18 @@
                 "”": "",
                 "]": ".",
                 "?": ".",
+		"………": "",
+		"…….": " ",
                 "….": ".",
                 "...": ".",
                 "..": ".",
                 ", ": ",",
                 ". ": ".",
                 "----": "",
+		"@": "a",
+		"   ": "",
+		"Đài ca": "Đại ca",
+		"kh ủng": "khủng",
                 "lỗi lỗitooi": "lỗi tôi",
                 "trên trênmajng": "trên mạng",
                 "với vớitooi": "với tôi",
@@ -214,8 +220,7 @@
             for (let key in replaceDict) {
                 text = text.split(key).join(replaceDict[key]);
             }
-            console.log(text)
-
+            
             let words = text.split(/\s+/); // Tách từ theo khoảng trắng
 
 
